@@ -4,7 +4,7 @@ defmodule Twinder do
     coordinator = spawn(Twinder.Coordinator, :loop, [ [], Enum.count(users) ])
     users
     |> Enum.map(fn u ->
-      pid = spawn(Twinder.User.Followers, :run_async, [])L
+      pid = spawn(Twinder.User.Followers, :run_async, [])
       send pid, {coordinator, u}
     end)
   end
