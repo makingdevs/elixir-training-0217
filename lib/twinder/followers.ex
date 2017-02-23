@@ -13,7 +13,8 @@ defmodule Twinder.User.Followers do
 
   def run_async do
     receive do
-      {parent, username} -> send parent, {:ok, followers_of(username)}
+      {parent, username} ->
+        send parent, {:ok, followers_of(username)}
       _ -> :noop
     end
   end
@@ -25,6 +26,7 @@ defmodule Twinder.User.Followers do
     |> parse_response
     |> extract_followers_info
     |> create_a_list_of_users
+    |> create_a_tuple(username)
   end
 
   defp create_url(username) do
@@ -58,6 +60,10 @@ defmodule Twinder.User.Followers do
   defp create_a_list_of_users(users_info) do
     for {id, username} <- users_info,
       do: User.new(id, username)
+  end
+
+  defp create_a_tuple(followers, username) do
+    { User.new(0, username), followers }
   end
 
 end
