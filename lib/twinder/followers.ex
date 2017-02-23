@@ -11,6 +11,13 @@ defmodule Twinder.User.Followers do
   @headers ["Authorization": "token #{@access_token}"]
   @http_options [ssl: [{:versions, [:'tlsv1.2']}], recv_timeout: 500]
 
+  def run_async do
+    receive do
+      {parent, username} -> send parent, followers_of(username)
+      _ -> :noop
+    end
+  end
+
   def followers_of(username) do
     username
     |> create_url
