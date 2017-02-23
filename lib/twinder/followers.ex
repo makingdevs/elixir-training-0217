@@ -13,7 +13,7 @@ defmodule Twinder.User.Followers do
 
   def run_async do
     receive do
-      {parent, username} -> send parent, followers_of(username)
+      {parent, username} -> send parent, {:ok, followers_of(username)}
       _ -> :noop
     end
   end
