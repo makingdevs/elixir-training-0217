@@ -1,18 +1,18 @@
 defmodule Twinder.Coordinator do
 
-  def loop(results \\ [], results_expected) do
+  def loop(users \\ [], users_expected, parent) do
     receive do
-      {:ok, result} ->
-        new_results = results ++ [result]
-        if Enum.count(new_results) == results_expected do
+      {:ok, user} ->
+        new_users = [user | users]
+        if Enum.count(new_users) == users_expected do
           send self(), :exit
         end
-        loop(new_results, results_expected)
+        loop(new_users, users_expected, parent)
       :exit ->
-        IO.puts "Results:"
-        IO.inspect results
+        # IO.inspect users
+        send parent, {:ok, users, parent}
       _ ->
-        loop(results, results_expected)
+        loop(users, users_expected, parent)
     end
   end
 
