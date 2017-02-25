@@ -9,7 +9,7 @@ defmodule Twinder.User.Followers do
   @followers_url "https://api.github.com/users/:username/followers"
   @access_token Application.get_env(:twinder, :access_token)
   @headers ["Authorization": "token #{@access_token}"]
-  @http_options [ssl: [{:versions, [:'tlsv1.2']}], recv_timeout: 500]
+  @http_options [ssl: [{:versions, [:'tlsv1.2']}], recv_timeout: 1000]
 
   def run_async do
     receive do
