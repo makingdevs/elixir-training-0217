@@ -1,4 +1,4 @@
-defmodule Twinder.User do
+defmodule Twinder.User.Info do
 
   def followers_of(users) when is_list(users) do
     coordinator = spawn(Twinder.Coordinator, :loop, [ [], Enum.count(users), self() ])
