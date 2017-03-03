@@ -22,7 +22,7 @@ defmodule PingPong.Player do
         end
     after 10000 ->
         IO.puts "EXIT"
-        Process.exit self, :kill
+        Process.exit self(), :kill
     end
   end
 end

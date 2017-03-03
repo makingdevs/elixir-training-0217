@@ -4,7 +4,7 @@ defmodule PingPong.Rock do
       {pid_pong} ->
         IO.puts ("Ping")
         :timer.sleep 2000
-        send(pid_pong, {self})
+        send(pid_pong, {self()})
         ping()
     end
   end
@@ -14,7 +14,7 @@ defmodule PingPong.Rock do
       {pid_ping} ->
         IO.puts ("Pong")
         :timer.sleep 2000
-        send(pid_ping, {self})
+        send(pid_ping, {self()})
         pong()
     end
   end

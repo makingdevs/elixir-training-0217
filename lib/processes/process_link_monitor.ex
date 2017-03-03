@@ -4,15 +4,15 @@ defmodule MyProceses.Linking do
     Process.flag(:trap_exit, true)
     spawn_link(__MODULE__, :explode, [])
     receive do
-      {:EXIT, from_pid, reason} ->
+      {:EXIT, _from_pid, reason} ->
         IO.puts "Exit: #{reason}"
     end
   end
 
   def run2 do
-    {pid, ref} = spawn_monitor(__MODULE__, :explode, [])
+    {_pid, ref} = spawn_monitor(__MODULE__, :explode, [])
     receive do
-      {:DOWN, ^ref, :process, from_pid, reason} ->
+      {:DOWN, ^ref, :process, _from_pid, reason} ->
         IO.puts "Exit: #{reason}"
     end
   end

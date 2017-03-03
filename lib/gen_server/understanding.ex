@@ -4,9 +4,9 @@ defmodule Speaker do
       {:say, msg} ->
         IO.puts msg
       _other ->
-        # throw away the message
+        :noop
     end
-    speak
+    speak()
   end
 
   def handle_message({:say, msg}) do
