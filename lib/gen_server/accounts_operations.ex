@@ -29,29 +29,30 @@ defmodule Bank.Account.Operations do
     GenServer.start_link __MODULE__, supervisor, opts
   end
 
+  # It seems _supervisor_ is no longer used
   def init(supervisor) do
     {:ok, %{supervisor: supervisor, accounts: []}}
   end
 
   def handle_cast(:new, state) do
-    {:ok, account} = Bank.Account.Supervisor.start_account state.supervisor
+    {:ok, account} = Bank.Account.Supervisor.start_account
     {:noreply, %{state | accounts: [account | state.accounts]}}
   end
 
   def handle_cast({:deposit, account_number, amount}, state) do
-    account = state.accounts |> find_account(account_number)
+    account = Bank.Account.Supervisor.find_account(account_number)
     Bank.Account.deposit(account, amount)
     {:noreply, state}
   end
 
   def handle_cast({:withdraw, account_number, amount}, state) do
-    account = state.accounts |> find_account(account_number)
+    account = Bank.Account.Supervisor.find_account(account_number)
     Bank.Account.withdraw(account, amount)
     {:noreply, state}
   end
 
   def handle_call({:balance, account_number}, _from, state) do
-    account = state.accounts |> find_account(account_number)
+    account = Bank.Account.Supervisor.find_account(account_number)
     {:reply, Bank.Account.balance(account), state}
   end
 
@@ -60,11 +61,4 @@ defmodule Bank.Account.Operations do
     {:reply, accounts, state}
   end
 
-  defp find_account(accounts, query_account) do
-    accounts
-    |> Enum.find( fn a ->
-      {account_number, _} = Bank.Account.balance a
-      account_number == query_account
-    end)
-  end
 end
