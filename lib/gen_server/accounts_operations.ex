@@ -51,6 +51,7 @@ defmodule Bank.Account.Operations do
   end
 
   def handle_call(:accounts, _from, state) do
-    {:reply, state.accounts, state}
+    accounts = for a <- state.accounts, do: Bank.Account.balance a
+    {:reply, accounts, state}
   end
 end
