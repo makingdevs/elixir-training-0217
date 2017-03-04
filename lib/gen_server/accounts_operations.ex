@@ -3,38 +3,39 @@ defmodule Bank.Account.Operations do
 
   ## GenServer API
 
-  def new_account(bank) do
-    GenServer.cast(bank, :new)
+  def new_account do
+    GenServer.cast(__MODULE__, :new)
   end
 
-  def deposit(bank, account_number, amount) do
-    GenServer.cast(bank, {:deposit, account_number, amount})
+  def deposit(account_number, amount) do
+    GenServer.cast(__MODULE__, {:deposit, account_number, amount})
   end
 
-  def withdraw(bank, account_number, amount) do
-    GenServer.cast(bank, {:withdraw, account_number, amount})
+  def withdraw(account_number, amount) do
+    GenServer.cast(__MODULE__, {:withdraw, account_number, amount})
   end
 
-  def balance(bank, account_number) do
-    GenServer.call(bank, {:balance, account_number})
+  def balance(account_number) do
+    GenServer.call(__MODULE__, {:balance, account_number})
   end
 
-  def all_accounts(bank) do
-    GenServer.call(bank, :accounts)
+  def all_accounts do
+    GenServer.call(__MODULE__, :accounts)
   end
 
   ## GenServer callbacks
 
-  def start_link(opts \\ []) do
-    GenServer.start_link __MODULE__, state, opts
+  def start_link(supervisor, opts \\ []) do
+    GenServer.start_link __MODULE__, supervisor, opts
   end
 
-  def init do
-    {:ok, []}
+  def init(supervisor) do
+    {:ok, %{supervisor: supervisor, accounts: []}}
   end
 
   def handle_cast(:new, state) do
-
+    {:ok, account} = Bank.Account.Supervisor.start_account state.supervisor
+    {:noreply, %{state | accounts: [account | state.accounts]}}
   end
 
   def handle_cast({:deposit, account_number, amount}, state) do
@@ -49,7 +50,7 @@ defmodule Bank.Account.Operations do
     
   end
 
-  def handle_call({:balance, account_number}, _from, state) do
-    
+  def handle_call(:accounts, _from, state) do
+    {:reply, state.accounts, state}
   end
 end
