@@ -19,6 +19,10 @@ defmodule Bank.Account.Operations do
     GenServer.call(bank, {:balance, account_number})
   end
 
+  def all_accounts(bank) do
+    GenServer.call(bank, :accounts)
+  end
+
   ## GenServer callbacks
 
   def start_link(opts \\ []) do
@@ -30,7 +34,7 @@ defmodule Bank.Account.Operations do
   end
 
   def handle_cast(:new, state) do
-    
+
   end
 
   def handle_cast({:deposit, account_number, amount}, state) do
@@ -38,6 +42,10 @@ defmodule Bank.Account.Operations do
   end
 
   def handle_cast({:withdraw, account_number, amount}, state) do
+    
+  end
+
+  def handle_call({:balance, account_number}, _from, state) do
     
   end
 
