@@ -9,7 +9,7 @@ defmodule Twinder do
 
     children = [
       supervisor(Bank.Supervisor, []),
-      supervisor(Bank.Account.Supervisor, [[name: Bank.Account.Supervisor]]),
+      supervisor(Bank.Account.Supervisor, []),
       worker(Bank.Account.Operations, [@bank_account_supervisor, [name: Bank.Account.Operations]])
       # Implement the Cache with ETS
     ]
