@@ -5,7 +5,8 @@ defmodule Twinder do
     import Supervisor.Spec
 
     children = [
-      supervisor(Bank.Supervisor, [])
+      supervisor(Bank.Supervisor, []),
+      supervisor(Bank.Account.Supervisor, [[name: Bank.Account.Supervisor]])
     ]
 
     Supervisor.start_link(children, [strategy: :one_for_one])
