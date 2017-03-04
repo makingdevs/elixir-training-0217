@@ -39,19 +39,32 @@ defmodule Bank.Account.Operations do
   end
 
   def handle_cast({:deposit, account_number, amount}, state) do
-    
+    account = state.accounts |> find_account(account_number)
+    Bank.Account.deposit(account, amount)
+    {:noreply, state}
   end
 
   def handle_cast({:withdraw, account_number, amount}, state) do
-    
+    account = state.accounts |> find_account(account_number)
+    Bank.Account.withdraw(account, amount)
+    {:noreply, state}
   end
 
   def handle_call({:balance, account_number}, _from, state) do
-    
+    account = state.accounts |> find_account(account_number)
+    {:reply, Bank.Account.balance(account), state}
   end
 
   def handle_call(:accounts, _from, state) do
     accounts = for a <- state.accounts, do: Bank.Account.balance a
     {:reply, accounts, state}
+  end
+
+  defp find_account(accounts, query_account) do
+    accounts
+    |> Enum.find( fn a ->
+      {account_number, _} = Bank.Account.balance a
+      account_number == query_account
+    end)
   end
 end
