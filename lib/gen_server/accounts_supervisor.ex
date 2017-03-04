@@ -11,6 +11,11 @@ defmodule Bank.Account.Supervisor do
     Supervisor.start_child supervisor, []
   end
 
+  def which_accounts(supervisor) do
+    supervisor
+    |> Supervisor.which_children
+  end
+
   ## Supervisor Callbacks
 
   def init(:ok) do
