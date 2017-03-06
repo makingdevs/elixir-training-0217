@@ -5,6 +5,7 @@ defmodule Twinder do
     import Supervisor.Spec
 
     children = [
+      worker(Bank.Account.Cache, []),
       supervisor(Bank.Account.Supervisor, []),
       # Implement the Cache with ETS
     ]
