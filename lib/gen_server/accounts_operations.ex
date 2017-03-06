@@ -36,6 +36,8 @@ defmodule Bank.Account.Operations do
 
   def handle_cast(:new, state) do
     {:ok, account} = Bank.Account.Supervisor.start_account
+    ## So, we have to know if _acccounts_ should be here
+    ## or is part of supervisor
     {:noreply, %{state | accounts: [account | state.accounts]}}
   end
 

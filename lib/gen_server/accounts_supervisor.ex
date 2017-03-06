@@ -10,10 +10,11 @@ defmodule Bank.Account.Supervisor do
 
   def find_account(account) do
     which_accounts()
-    |> Enum.find( fn a ->
+    |> Enum.find( fn {_, a, _, _} ->
       {account_number, _} = Bank.Account.balance a
       account_number == account
     end)
+    |> elem(1) # {_, pid, _, _}
   end
 
   def which_accounts do
