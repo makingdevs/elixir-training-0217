@@ -3,23 +3,17 @@ defmodule Bank.Account.Supervisor do
 
   ## Supervisor API
 
-  def start_account do
-    # Here is the chance for ETS cache
-    Supervisor.start_child __MODULE__, []
+  def new_account(account_number) do
+    Supervisor.start_child __MODULE__, [account_number]
   end
 
-  def find_account(account) do
-    which_accounts()
-    |> Enum.find( fn {_, a, _, _} ->
-      {account_number, _} = Bank.Account.balance a
-      account_number == account
-    end)
-    |> elem(1) # {_, pid, _, _}
-  end
-
-  def which_accounts do
+  def find_account(account_number) do
     __MODULE__
     |> Supervisor.which_children
+    |> Enum.find( fn {_, a, _, _} ->
+      # Search in GenServer
+    end)
+    |> elem(1) # {_, pid, _, _}
   end
 
   ## Supervisor Callbacks
@@ -30,7 +24,7 @@ defmodule Bank.Account.Supervisor do
 
   def init(:ok) do
     children = [
-      worker(Bank.Account, [])
+      worker(Bank.Account.Operations, [])
     ]
     supervise(children, strategy: :simple_one_for_one)
   end
