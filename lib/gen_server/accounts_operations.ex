@@ -27,11 +27,11 @@ defmodule Bank.Account.Operations do
   end
 
   def handle_cast({:deposit, amount}, state) do
-    {:noreply, state }
+    {:noreply, %{state | amount: state.amount + amount } }
   end
 
   def handle_cast({:withdraw, amount}, state) do
-    {:noreply, state }
+    {:noreply, %{state | amount: state.amount - amount } }
   end
 
   def handle_call({:balance}, _from, state) do
