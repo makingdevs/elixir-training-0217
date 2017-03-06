@@ -7,7 +7,6 @@ defmodule Twinder do
     children = [
       worker(Bank.Account.Cache, []),
       supervisor(Bank.Account.Supervisor, []),
-      # Implement the Cache with ETS
     ]
 
     Supervisor.start_link(children, [strategy: :one_for_one])
