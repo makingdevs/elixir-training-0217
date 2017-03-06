@@ -26,16 +26,20 @@ defmodule Bank.Account.Operations do
   end
 
   def init(account_number) do
-    # Here is the chance for ETS cache
-    {:ok, %{account_number: account_number, amount: 0}}
+    state = Bank.Account.Cache.find(account_number) || %{account_number: account_number, amount: 0}
+    {:ok, state}
   end
 
   def handle_cast({:deposit, amount}, state) do
-    {:noreply, %{state | amount: state.amount + amount } }
+    state = %{state | amount: state.amount + amount }
+    Bank.Account.Cache.save(state)
+    {:noreply, state }
   end
 
   def handle_cast({:withdraw, amount}, state) do
-    {:noreply, %{state | amount: state.amount - amount } }
+    state = %{state | amount: state.amount - amount }
+    Bank.Account.Cache.save(state)
+    {:noreply, state }
   end
 
   def handle_call({:balance}, _from, state) do
