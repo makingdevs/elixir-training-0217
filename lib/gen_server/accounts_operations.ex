@@ -3,64 +3,39 @@ defmodule Bank.Account.Operations do
 
   ## GenServer API
 
-  def new_account do
-    GenServer.cast(__MODULE__, :new)
+  def deposit(account, amount) do
+    GenServer.cast(account, {:deposit, amount})
   end
 
-  def deposit(account_number, amount) do
-    GenServer.cast(__MODULE__, {:deposit, account_number, amount})
+  def withdraw(account, amount) do
+    GenServer.cast(account, {:withdraw, amount})
   end
 
-  def withdraw(account_number, amount) do
-    GenServer.cast(__MODULE__, {:withdraw, account_number, amount})
-  end
-
-  def balance(account_number) do
-    GenServer.call(__MODULE__, {:balance, account_number})
-  end
-
-  def all_accounts do
-    GenServer.call(__MODULE__, :accounts)
+  def balance(account) do
+    GenServer.call(account, {:balance})
   end
 
   ## GenServer callbacks
 
-  def start_link(supervisor, opts \\ []) do
-    GenServer.start_link __MODULE__, supervisor, opts
+  def start_link(account_number, opts \\ []) do
+    GenServer.start_link __MODULE__, account_number, opts
   end
 
-  # It seems _supervisor_ is no longer used
-  def init(supervisor) do
-    {:ok, %{supervisor: supervisor, accounts: []}}
+  def init(account_number) do
+    # Here is the chance for ETS cache
+    {:ok, %{account_number: account_number, amount: 0}}
   end
 
-  def handle_cast(:new, state) do
-    {:ok, account} = Bank.Account.Supervisor.start_account
-    ## So, we have to know if _acccounts_ should be here
-    ## or is part of supervisor
-    {:noreply, %{state | accounts: [account | state.accounts]}}
+  def handle_cast({:deposit, amount}, state) do
+    {:noreply, state }
   end
 
-  def handle_cast({:deposit, account_number, amount}, state) do
-    account = Bank.Account.Supervisor.find_account(account_number)
-    Bank.Account.deposit(account, amount)
-    {:noreply, state}
+  def handle_cast({:withdraw, amount}, state) do
+    {:noreply, state }
   end
 
-  def handle_cast({:withdraw, account_number, amount}, state) do
-    account = Bank.Account.Supervisor.find_account(account_number)
-    Bank.Account.withdraw(account, amount)
-    {:noreply, state}
-  end
-
-  def handle_call({:balance, account_number}, _from, state) do
-    account = Bank.Account.Supervisor.find_account(account_number)
-    {:reply, Bank.Account.balance(account), state}
-  end
-
-  def handle_call(:accounts, _from, state) do
-    accounts = for a <- state.accounts, do: Bank.Account.balance a
-    {:reply, accounts, state}
+  def handle_call({:balance}, _from, state) do
+    {:reply, state.amount, state}
   end
 
 end
