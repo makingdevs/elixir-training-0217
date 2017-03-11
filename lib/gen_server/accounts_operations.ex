@@ -42,7 +42,7 @@ defmodule Bank.Account.Operations do
   end
 
   def handle_call({:balance}, _from, state) do
-    {:reply, state.amount, state}
+    {:reply, Bank.Account.balance(state.movements), state}
   end
 
   def handle_call({:info}, _from, state) do
