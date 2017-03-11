@@ -26,19 +26,18 @@ defmodule Bank.Account.Operations do
   end
 
   def init(account_number) do
-    state = Bank.Account.Cache.find(account_number) || %{account_number: account_number, amount: 0}
+    {:ok, account} = Bank.Account.start_link(account_number)
+    state = %{account_number: account_number, movements: account}
     {:ok, state}
   end
 
-  def handle_cast({:deposit, amount}, state) do
-    state = %{state | amount: state.amount + amount }
-    Bank.Account.Cache.save(state)
+  def handle_cast({:deposit, amount}, %{movements: account} = state) do
+    Bank.Account.deposit(account, amount)
     {:noreply, state }
   end
 
-  def handle_cast({:withdraw, amount}, state) do
-    state = %{state | amount: state.amount - amount }
-    Bank.Account.Cache.save(state)
+  def handle_cast({:withdraw, amount}, %{movements: account} = state) do
+    Bank.Account.withdraw(account, amount)
     {:noreply, state }
   end
 
