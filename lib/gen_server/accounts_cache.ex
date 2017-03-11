@@ -3,6 +3,9 @@ defmodule Bank.Account.Cache do
 
   ## API client
 
+  ## I think this could be used by the agent
+  ## storing the list of tuples
+
   def save(account) do
     :ets.insert(__MODULE__, {account.account_number, account})
   end

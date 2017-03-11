@@ -7,6 +7,7 @@ defmodule Twinder do
     children = [
       worker(Bank.Account.Cache, []),
       supervisor(Bank.Account.Supervisor, []),
+      supervisor(Twinder.User.Supervisor, [])
     ]
 
     Supervisor.start_link(children, [strategy: :one_for_one])
