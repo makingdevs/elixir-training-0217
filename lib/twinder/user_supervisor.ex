@@ -26,7 +26,7 @@ defmodule Twinder.User.Supervisor do
 
   def init(:ok) do
     children = [
-      worker(Twinder.User.Server, [])
+      worker(Twinder.User.Store, [])
     ]
     supervise(children, strategy: :simple_one_for_one)
   end
