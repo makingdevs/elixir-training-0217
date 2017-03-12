@@ -1,7 +1,5 @@
 defmodule Twinder.User.Store do
 
-  ## TODO: This is a bada impl, surely...
-  ## We have to make a Task to process
   def start_link(username) do
     Agent.start_link fn ->
       followers = Task.Supervisor.async(Twinder.TaskSupervisor, fn ->

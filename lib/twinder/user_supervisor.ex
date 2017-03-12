@@ -1,6 +1,9 @@
 defmodule Twinder.User.Supervisor do
   use Supervisor
 
+  alias Twinder.User.Store
+  alias Twinder.User
+
   ## Supervisor API
 
   def new_user(username) do
@@ -9,10 +12,17 @@ defmodule Twinder.User.Supervisor do
     end)
   end
 
+  def find_one(username) do
+    all_accounts()
+    |> Enum.find(fn %User{username: u} ->
+      u == username
+    end)
+  end
+
   def all_accounts do
     childrens()
     |> Enum.map(fn {_, pid, _, _} ->
-      Twinder.User.Store.current_state pid
+      Store.current_state pid
     end)
   end
 
