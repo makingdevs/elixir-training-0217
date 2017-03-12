@@ -1,7 +1,11 @@
 defmodule Twinder.User.Store do
 
-  def start_link({id, username}) do
-    Agent.start_link fn -> Twinder.User.new(id, username) end
+  ## TODO: This is a bada impl, surely...
+  ## We have to make a Task to process
+  def start_link(username) do
+    Agent.start_link fn ->
+      Twinder.User.get_user username
+    end
   end
 
   def add_followers(user, followers) do
