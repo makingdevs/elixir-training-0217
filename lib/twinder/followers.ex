@@ -26,7 +26,6 @@ defmodule Twinder.User.Followers do
     |> parse_response
     |> extract_followers_info
     |> create_a_list_of_users
-    |> create_a_struct(username)
   end
 
   defp create_url(username) do
@@ -54,16 +53,12 @@ defmodule Twinder.User.Followers do
 
   defp extract_followers_info({:ok, followers}) when is_list(followers) do
     for u <- followers,
-      do: {u["id"], u["login"]}
+      do: {u["id"], u["login"], u["name"]}
   end
 
   defp create_a_list_of_users(users_info) do
-    for {id, username} <- users_info,
-      do: User.new(id, username)
-  end
-
-  defp create_a_struct(followers, username) do
-    %{ User.new(0, username) | followers: followers }
+    for {id, username, name} <- users_info,
+      do: %User{id: id, username: username, name: name}
   end
 
 end
