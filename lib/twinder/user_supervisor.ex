@@ -29,14 +29,22 @@ defmodule Twinder.User.Supervisor do
     for follower_for_user1 <- u1.followers,
       follower_for_user2 <- u2.followers,
       follower_for_user1.id == follower_for_user2.id,
-      do: follower_for_user1
+      do: find_one(follower_for_user1.username)
   end
 
   def find_interactions(followers) do
     for current_user <- followers,
       user <- followers,
       current_user.id != user.id,
-      do: {current_user.username, user.username}
+      do: {current_user.username, is_in_followers_of(current_user, user), user.username}
+  end
+
+  defp is_in_followers_of(user1, user2) do
+    ids = user2.followers |> Enum.map(&(&1.id))
+    case user1.id in ids do
+      true -> :following
+      false -> :not_following
+    end
   end
 
   def all_accounts do
