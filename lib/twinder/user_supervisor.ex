@@ -19,6 +19,15 @@ defmodule Twinder.User.Supervisor do
     end)
   end
 
+  def common_followers(username1, username2) do
+    u1 = find_one(username1)
+    u2 = find_one(username2)
+    for follower_for_user1 <- u1.followers,
+      follower_for_user2 <- u2.followers,
+      follower_for_user1.id == follower_for_user2.id,
+      do: follower_for_user1
+  end
+
   def all_accounts do
     childrens()
     |> Enum.map(fn {_, pid, _, _} ->
