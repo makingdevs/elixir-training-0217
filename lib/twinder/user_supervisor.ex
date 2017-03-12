@@ -4,7 +4,9 @@ defmodule Twinder.User.Supervisor do
   ## Supervisor API
 
   def new_user(username) do
-    Supervisor.start_child __MODULE__, [username]
+    Task.Supervisor.start_child(Twinder.TaskSupervisor, fn ->
+      Supervisor.start_child __MODULE__, [username]
+    end)
   end
 
   def all_accounts do
