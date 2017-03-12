@@ -14,8 +14,8 @@ defmodule Twinder.User.Server do
   end
 
   def init(username) do
-    user_pid = Task.async(fn -> Twinder.User.get_user username end)
-    {:ok, Task.await(user_pid)}
+    user = Twinder.User.get_user username
+    {:ok, user}
   end
 
   def handle_cast({:info}, _from, state) do
