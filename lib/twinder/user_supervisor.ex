@@ -8,7 +8,10 @@ defmodule Twinder.User.Supervisor do
 
   def new_user(username) do
     Task.Supervisor.start_child(Twinder.TaskSupervisor, fn ->
-      Supervisor.start_child __MODULE__, [username]
+      case find_one(username) do
+        nil -> Supervisor.start_child __MODULE__, [username]
+          _ -> :already_exists
+      end
     end)
   end
 
