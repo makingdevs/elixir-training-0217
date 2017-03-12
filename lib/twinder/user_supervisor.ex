@@ -7,12 +7,13 @@ defmodule Twinder.User.Supervisor do
   ## Supervisor API
 
   def new_user(username) do
-    Task.Supervisor.start_child(Twinder.TaskSupervisor, fn ->
-      case find_one(username) do
-        nil -> Supervisor.start_child __MODULE__, [username]
-          _ -> :already_exists
-      end
-    end)
+    case find_one(username) do
+      nil ->
+        Task.Supervisor.start_child(Twinder.TaskSupervisor, fn ->
+          Supervisor.start_child __MODULE__, [username]
+        end)
+      _ -> :already_exists
+    end
   end
 
   def find_one(username) do
