@@ -32,6 +32,13 @@ defmodule Twinder.User.Supervisor do
       do: follower_for_user1
   end
 
+  def find_interactions(followers) do
+    for current_user <- followers,
+      user <- followers,
+      current_user.id != user.id,
+      do: {current_user.username, user.username}
+  end
+
   def all_accounts do
     childrens()
     |> Enum.map(fn {_, pid, _, _} ->
