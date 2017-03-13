@@ -45,6 +45,8 @@ defmodule Twinder.User.Supervisor do
   def find_interactions(followers) do
     for current_user <- followers,
       user <- followers,
+      current_user != nil,
+      user != nil,
       current_user.id != user.id,
       do: {current_user.username, is_in_followers_of(current_user, user), user.username}
   end
