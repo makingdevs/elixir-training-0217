@@ -22,8 +22,7 @@ defmodule Twinder.User.Followers do
   def followers_of(username) do
     username
     |> create_url
-    |> make_a_request
-    |> parse_response
+    |> collect_followers_info
     |> extract_followers_info
     |> create_a_list_of_users
   end
@@ -34,24 +33,39 @@ defmodule Twinder.User.Followers do
     |> replace(":username", username)
   end
 
+  defp collect_followers_info(url), do: join_followers(url, [], 1)
+
+  defp join_followers(url, followers, 0), do: followers
+  defp join_followers(url, followers, page) do
+    {followers_per_page, should_continue} = url <> "?page=#{page}"
+    |> make_a_request
+    |> parse_response
+    next_page = if should_continue, do: page + 1, else: 0
+    join_followers(url, followers_per_page ++ followers, next_page)
+  end
+
   defp make_a_request(url) do
     HTTP.get url, @headers, @http_options
   end
 
   defp parse_response({:ok, %Response{
-                          body: body, headers: _headers, status_code: 200}}) do
-    body |> decode
+                          body: body, headers: headers, status_code: 200}}) do
+    more_pages? = headers
+    |> Enum.find( fn {name, _} -> name == "Link"  end)
+    |> extract_header_value
+    |> String.contains?("next")
+    {:ok, followers} = body |> decode
+    {followers, more_pages?}
   end
-  defp parse_response({:ok, %HTTPoison.Response{
+  defp parse_response({:ok, %Response{
                           body: body, headers: _headers, status_code: code}}) when code in 400..499 do
     body |> decode
   end
 
-  defp extract_followers_info({:ok, %{"message" => "Not Found"}}) do
-    []
-  end
+  defp extract_header_value(nil), do: ""
+  defp extract_header_value({_, value}), do: value
 
-  defp extract_followers_info({:ok, followers}) when is_list(followers) do
+  defp extract_followers_info(followers) when is_list(followers) do
     for u <- followers,
       do: {u["id"], u["login"], u["name"]}
   end
