@@ -34,8 +34,8 @@ defmodule Twinder.User.Supervisor do
   end
 
   def common_followers(username1, username2) do
-    u1 = find_one(username1)
-    u2 = find_one(username2)
+    u1 = find_one(username1) || %User{username: username1}
+    u2 = find_one(username2) || %User{username: username2}
     for follower_for_user1 <- u1.followers,
       follower_for_user2 <- u2.followers,
       follower_for_user1.id == follower_for_user2.id,
