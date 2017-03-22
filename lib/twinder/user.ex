@@ -1,10 +1,10 @@
 defmodule Twinder.User do
+  @behaviour Twinder.Social.User
   import JSON, only: [decode: 1]
-  alias Twinder.User
   alias HTTPoison, as: HTTP
   alias HTTP.Response
 
-  defstruct username: "", name: "", id: 0, followers: []
+  defstruct username: "", name: "", id: 0, followers: [], followers_size: 0
 
   @user_url "https://api.github.com/users/:username"
   @access_token Application.get_env(:twinder, :access_token)
@@ -39,7 +39,12 @@ defmodule Twinder.User do
   end
 
   defp create_new_user({:ok, user_info}) do
-    %__MODULE__{id: user_info["id"], username: user_info["login"], name: user_info["name"]}
+    %__MODULE__{
+      id: user_info["id"],
+      username: user_info["login"],
+      name: user_info["name"],
+      followers_size: user_info["followers"]
+    }
   end
 
 end
