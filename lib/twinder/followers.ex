@@ -46,6 +46,10 @@ defmodule Twinder.User.Followers do
     HTTP.get url, @headers, @http_options
   end
 
+  defp parse_response({:error, error}) do
+    IO.inspect error
+    []
+  end
   defp parse_response({:ok, %Response{
                           body: body, headers: _headers, status_code: 200}}) do
     {:ok, followers} = body |> decode
@@ -53,7 +57,9 @@ defmodule Twinder.User.Followers do
   end
   defp parse_response({:ok, %Response{
                           body: body, headers: _headers, status_code: code}}) when code in 400..499 do
-    body |> decode
+    response = body |> decode
+    IO.inspect response
+    response
   end
 
   defp extract_followers_info(followers) when is_list(followers) do
