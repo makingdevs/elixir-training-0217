@@ -1,27 +1,20 @@
 defmodule Twinder.User.Followers do
+  @behaviour Twinder.Social.User.Followers
   import JSON, only: [decode: 1]
+  import Enum, only: :functions
   alias Twinder.User
   alias HTTPoison, as: HTTP
   alias HTTP.Response
-  # import Integer, only: :macros
-  # import Integer, only: :functions
 
   @followers_url "https://api.github.com/users/:username/followers"
   @access_token Application.get_env(:twinder, :access_token)
   @headers ["Authorization": "token #{@access_token}"]
   @http_options [ssl: [{:versions, [:'tlsv1.2']}], recv_timeout: 1000]
 
-  def run_async do
-    receive do
-      {parent, username} ->
-        send parent, {:ok, followers_of(username)}
-      _ -> :noop
-    end
-  end
-
-  def followers_of(username) do
+  def followers_of(%User{username: username, followers_size: followers_size}) do
     username
     |> create_url
+    |> make_request_for_size(followers_size)
     |> collect_followers_info
     |> extract_followers_info
     |> create_a_list_of_users
@@ -33,15 +26,19 @@ defmodule Twinder.User.Followers do
     |> replace(":username", username)
   end
 
-  defp collect_followers_info(url), do: join_followers(url, [], 1)
+  defp make_request_for_size(url, followers_size) do
+    pages = div(followers_size, 30) + 1
+    1..pages
+    |> map(fn page ->
+      Task.async(fn -> make_a_request(url <> "?page=#{page}") end)
+    end)
+  end
 
-  defp join_followers(url, followers, 0), do: followers
-  defp join_followers(url, followers, page) do
-    {followers_per_page, should_continue} = url <> "?page=#{page}"
-    |> make_a_request
-    |> parse_response
-    next_page = if should_continue, do: page + 1, else: 0
-    join_followers(url, followers_per_page ++ followers, next_page)
+  defp collect_followers_info(tasks) do
+    tasks
+    |> map(fn task -> Task.await(task) end)
+    |> map(fn response -> parse_response(response) end)
+    |> flat_map(&(&1))
   end
 
   defp make_a_request(url) do
@@ -49,21 +46,14 @@ defmodule Twinder.User.Followers do
   end
 
   defp parse_response({:ok, %Response{
-                          body: body, headers: headers, status_code: 200}}) do
-    more_pages? = headers
-    |> Enum.find( fn {name, _} -> name == "Link"  end)
-    |> extract_header_value
-    |> String.contains?("next")
+                          body: body, headers: _headers, status_code: 200}}) do
     {:ok, followers} = body |> decode
-    {followers, more_pages?}
+    followers
   end
   defp parse_response({:ok, %Response{
                           body: body, headers: _headers, status_code: code}}) when code in 400..499 do
     body |> decode
   end
-
-  defp extract_header_value(nil), do: ""
-  defp extract_header_value({_, value}), do: value
 
   defp extract_followers_info(followers) when is_list(followers) do
     for u <- followers,
