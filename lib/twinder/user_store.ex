@@ -2,11 +2,11 @@ defmodule Twinder.User.Store do
 
   def start_link(username) do
     Agent.start_link fn ->
+      user = Twinder.User.get_user(username)
       followers = Task.Supervisor.async(Twinder.TaskSupervisor, fn ->
-        Twinder.User.Followers.followers_of username
+        Twinder.User.Followers.followers_of user
       end) |> Task.await
-      %Twinder.User{ Twinder.User.get_user(username) |
-                    followers: followers }
+      %Twinder.User{ user | followers: followers }
     end
   end
 
