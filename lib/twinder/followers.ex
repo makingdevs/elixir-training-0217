@@ -11,6 +11,7 @@ defmodule Twinder.User.Followers do
   @headers ["Authorization": "token #{@access_token}"]
   @http_options [ssl: [{:versions, [:'tlsv1.2']}], recv_timeout: 3000]
 
+  def followers_of(%User{followers_size: 0}), do: []
   def followers_of(%User{username: username, followers_size: followers_size}) do
     username
     |> create_url
