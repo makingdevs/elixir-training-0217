@@ -9,7 +9,7 @@ defmodule Twinder.User.Followers do
   @followers_url "https://api.github.com/users/:username/followers"
   @access_token Application.get_env(:twinder, :access_token)
   @headers ["Authorization": "token #{@access_token}"]
-  @http_options [ssl: [{:versions, [:'tlsv1.2']}], recv_timeout: 1000]
+  @http_options [ssl: [{:versions, [:'tlsv1.2']}], recv_timeout: 3000]
 
   def followers_of(%User{username: username, followers_size: followers_size}) do
     username

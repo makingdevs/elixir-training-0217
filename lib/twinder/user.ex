@@ -9,7 +9,7 @@ defmodule Twinder.User do
   @user_url "https://api.github.com/users/:username"
   @access_token Application.get_env(:twinder, :access_token)
   @headers ["Authorization": "token #{@access_token}"]
-  @http_options [ssl: [{:versions, [:'tlsv1.2']}], recv_timeout: 1000]
+  @http_options [ssl: [{:versions, [:'tlsv1.2']}], recv_timeout: 2000]
 
   def get_user(username) do
     username
