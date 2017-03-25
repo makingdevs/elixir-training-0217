@@ -14,7 +14,7 @@ defmodule Twinder.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [mod: {Twinder,[]}, applications: [:logger, :httpoison, :graphvix]]
+    [mod: {Twinder,[]}, applications: [:logger, :httpoison, :graphvix, :extwitter]]
   end
 
   # Dependencies can be Hex packages:
@@ -30,7 +30,8 @@ defmodule Twinder.Mixfile do
     [
       {:httpoison, "~> 0.10.0"},
       {:json, "~> 1.0"},
-      {:graphvix, "~> 0.5.0"}
+      {:graphvix, "~> 0.5.0"},
+      {:extwitter, "~> 0.8"}
     ]
   end
 end
