@@ -9,7 +9,7 @@ defmodule Twinder.User do
   @user_url "https://api.github.com/users/:username"
   @access_token Application.get_env(:twinder, :access_token)
   @headers ["Authorization": "token #{@access_token}"]
-  @http_options [ssl: [{:versions, [:'tlsv1.2']}], recv_timeout: 3000]
+  @http_options [ssl: [{:versions, [:'tlsv1.2']}], recv_timeout: 10000]
 
   def get_user(username) do
     username
@@ -29,6 +29,10 @@ defmodule Twinder.User do
     HTTP.get url, @headers, @http_options
   end
 
+  defp parse_response({:error, error}) do
+    IO.inspect error
+    %{}
+  end
   defp parse_response({:ok, %Response{
                           body: body, headers: _headers, status_code: 200}}) do
     body |> decode

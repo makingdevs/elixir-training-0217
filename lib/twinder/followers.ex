@@ -9,7 +9,8 @@ defmodule Twinder.User.Followers do
   @followers_url "https://api.github.com/users/:username/followers"
   @access_token Application.get_env(:twinder, :access_token)
   @headers ["Authorization": "token #{@access_token}"]
-  @http_options [ssl: [{:versions, [:'tlsv1.2']}], recv_timeout: 3000]
+  @http_options [ssl: [{:versions, [:'tlsv1.2']}], recv_timeout: 10000]
+  @page_size 100
 
   def followers_of(%User{followers_size: 0}), do: []
   def followers_of(%User{username: username, followers_size: followers_size}) do
@@ -28,16 +29,16 @@ defmodule Twinder.User.Followers do
   end
 
   defp make_request_for_size(url, followers_size) do
-    pages = div(followers_size, 30) + 1
+    pages = div(followers_size, @page_size) + 1
     1..pages
     |> map(fn page ->
-      Task.async(fn -> make_a_request(url <> "?page=#{page}") end)
+      Task.async(fn -> make_a_request(url <> "?page=#{page}&per_page=#{@page_size}") end)
     end)
   end
 
   defp collect_followers_info(tasks) do
     tasks
-    |> map(fn task -> Task.await(task) end)
+    |> map(fn task -> Task.await(task, 15000) end)
     |> map(fn response -> parse_response(response) end)
     |> flat_map(&(&1))
   end
