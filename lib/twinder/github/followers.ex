@@ -1,4 +1,4 @@
-defmodule Twinder.User.Followers do
+defmodule Twinder.Social.User.Github.Followers do
   @behaviour Twinder.Social.User.Followers
   import JSON, only: [decode: 1]
   import Enum, only: :functions

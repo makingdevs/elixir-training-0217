@@ -1,10 +1,11 @@
 defmodule Twinder.User.Store do
+  alias Twinder.Social.User.Github
 
   def start_link(username) do
     Agent.start_link fn ->
-      user = Twinder.User.get_user(username)
+      user = Github.get_user(username)
       followers = Task.Supervisor.async(Twinder.TaskSupervisor, fn ->
-        Twinder.User.Followers.followers_of user
+        Github.Followers.followers_of user
       end) |> Task.await
       %Twinder.User{ user | followers: followers }
     end
