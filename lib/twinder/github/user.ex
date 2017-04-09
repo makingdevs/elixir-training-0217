@@ -46,7 +46,8 @@ defmodule Twinder.Social.User.Github do
       id: user_info["id"],
       username: user_info["login"],
       name: user_info["name"],
-      followers_size: user_info["followers"]
+      followers_size: user_info["followers"],
+      network: :github
     }
   end
 
