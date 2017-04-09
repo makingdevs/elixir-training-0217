@@ -70,7 +70,7 @@ defmodule Twinder.Social.User.Github.Followers do
 
   defp create_a_list_of_users(users_info) do
     for {id, username, name} <- users_info,
-      do: %User{id: id, username: username, name: name}
+      do: %User{id: id, username: username, name: name, network: :github}
   end
 
 end
