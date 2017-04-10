@@ -6,36 +6,36 @@ defmodule Twinder.User.Supervisor do
 
   ## Supervisor API
 
-  def new_user(username) do
-    case find_one(username) do
+  def new_user(username, network) do
+    case find_one(username, network) do
       nil ->
         Task.Supervisor.start_child(Twinder.TaskSupervisor, fn ->
-          Supervisor.start_child __MODULE__, [username]
+          Supervisor.start_child __MODULE__, [username, network]
         end)
       _ -> :already_exists
     end
   end
 
-  def new_users(many_usernames) do
+  def new_users(many_usernames, network) do
     many_usernames
-    |> Enum.map(&(new_user/1))
+    |> Enum.map(&(new_user(&1, network)))
   end
 
-  def find_one(username) do
+  def find_one(username, network) do
     all_accounts()
-    |> Enum.find(fn %User{username: u} ->
-      u == username
+    |> Enum.find(fn %User{username: u, network: n} ->
+      u == username && n == network
     end)
   end
 
-  def find_many(usernames) do
+  def find_many(usernames, network) do
     usernames
-    |> Enum.map(&(find_one/1))
+    |> Enum.map(&(find_one(&1, network)))
   end
 
-  def common_followers(username1, username2) do
-    u1 = find_one(username1) || %User{username: username1}
-    u2 = find_one(username2) || %User{username: username2}
+  def common_followers(username1, username2, network) do
+    u1 = find_one(username1, network) || %User{username: username1, network: network}
+    u2 = find_one(username2, network) || %User{username: username2, network: network}
     for follower_for_user1 <- u1.followers,
       follower_for_user2 <- u2.followers,
       follower_for_user1.id == follower_for_user2.id,
