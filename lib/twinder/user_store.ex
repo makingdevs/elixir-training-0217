@@ -5,8 +5,8 @@ defmodule Twinder.User.Store do
   def start_link(username, network) do
     Agent.start_link fn ->
       case network do
-        :twitter -> start_link_for_github(username)
-        :github -> start_link_for_twitter(username)
+        :twitter -> start_link_for_twitter(username)
+        :github -> start_link_for_github(username)
       end
     end
   end
